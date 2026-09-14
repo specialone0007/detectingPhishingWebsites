@@ -10,11 +10,11 @@ caching, model-free feature analysis, eight classifiers behind one interface, an
 protocol that keeps the test fold untouched until the end.
 
 Started as a Sabancı University CS525 (Data Mining) project in 2022; rewritten in 2026 from the
-16-page report (kept in [`docs/legacy/`](docs/legacy/)) into code that reproduces, and in two
-places corrects, its results.
+16-page report (kept in [`docs/legacy/`](docs/legacy/)) into a tested package with a stricter
+evaluation protocol and updated results.
 
 **[Read the report (PDF, 8 pages)](docs/report.pdf)** — dataset and feature analysis, evaluation
-protocol, results for eight classifiers, and what the 2022 report got wrong. Source in
+protocol, results for eight classifiers, and what changed since the 2022 study. Source in
 [`docs/report.md`](docs/report.md).
 
 ![model comparison](docs/figures/model-comparison.png)
@@ -39,11 +39,11 @@ Full table: [`results/model-results.csv`](results/model-results.csv).
 
 Three things worth saying out loud:
 
-- **The 2022 report's headline (LightGBM 0.98) does not reproduce.** With the report's tuned
-  parameters LightGBM is the *weakest* of the non-linear models here (0.958). With library
-  defaults it ties for first (0.977). The most likely explanation is that the 2022 numbers were
-  read off the same split that was used for tuning. This rewrite selects on CV and reports on a
-  fold no model has seen.
+- **Stricter protocol, updated headline.** The 2022 study reported LightGBM at 0.98 on its
+  development split. Under the new protocol (select on 5-fold CV, report on an untouched
+  hold-out) LightGBM with library defaults reaches 0.977 and ties for first; the 2022 tuned
+  configuration, which was chosen for a different split, lands at 0.958. The hold-out number is
+  the one to quote.
 - **Non-linear beats linear by ~5 points**, and the non-linear models are within one point of
   each other. A hard core remains: 22 test sites (1.0 %) are misclassified by all five
   non-linear models. 20 of the 22 are phishing sites, and 19 of them carry a valid SSL state
@@ -116,9 +116,9 @@ print(clf.score(X_te, y_te))             # 0.9765
 
 UCI ML Repository id 327, *Phishing Websites* (Mohammad, Thabtah & McCluskey). Downloaded from
 `archive.ics.uci.edu` and cached as `data/phishing_websites.csv`. The `Result` column uses
--1 for phishing and 1 for legitimate, the same polarity as every feature; the 2022 report read
-it the other way round. Accuracy is unaffected, but precision and recall per class swap, so
-this package renames the target to `is_phishing` and never exposes the raw sign again.
+-1 for phishing and 1 for legitimate, the same polarity as every feature. To keep that
+convention unambiguous, the package maps it once, in the loader, to `is_phishing` ∈ {0, 1}, so
+"positive" means "phishing" in every metric and figure.
 
 ## License
 

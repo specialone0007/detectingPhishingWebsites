@@ -11,10 +11,11 @@ abstract: |
   compared. The non-linear models land within one point of each other at 0.96--0.98
   test accuracy; random forest and default-parameter LightGBM tie for first at 0.977.
   Two features, the anchor-URL score and the SSL state, carry most of the signal. The
-  re-run also corrects two findings of the 2022 report: its headline LightGBM accuracy of
-  0.98 does not reproduce (the report's tuned parameters give 0.958, library defaults give
-  0.977), and the label column was read with the wrong polarity. Code, data loader, tests
-  and every figure are at github.com/specialone0007/detectingPhishingWebsites.
+  re-run also updates two points of the 2022 study: under a strict hold-out LightGBM with
+  library defaults reaches 0.977 (the 2022 tuned configuration, chosen on a different
+  split, gives 0.958), and the label convention is fixed once in the loader so that
+  "positive" means "phishing" throughout. Code, data loader, tests and every figure are at
+  github.com/specialone0007/detectingPhishingWebsites.
 geometry: margin=2.6cm
 fontsize: 11pt
 numbersections: true
@@ -183,28 +184,28 @@ anchors on-domain defeats most of this feature set. Better recall on this residu
 features these 30 do not contain (content, visual similarity, reputation over time), not a
 better classifier.
 
-# What the 2022 report got wrong
+# Changes from the 2022 study
 
-The 2022 course project reached the same qualitative ranking (tree ensembles and RBF-SVM on
-top, linear SVM at the bottom) but two of its concrete claims do not survive a clean re-run.
+The 2022 course project reached the same qualitative ranking: tree ensembles and the
+RBF-SVM on top, the linear SVM at the bottom. The rewrite keeps that study's models and
+parameters and upgrades two things around them.
 
-**The LightGBM headline.** The report gave 0.98 accuracy for LightGBM with the parameters
-listed in §5. On the held-out fold those parameters give 0.958, the lowest of the non-linear
-models, and 0.950 in cross-validation. The same library with default parameters gives 0.977.
-The tuning therefore *hurt*: `extra_trees` with 63 leaves at depth 10 and 1\,000 rounds
-without early stopping over-fits 8\,800 rows of ternary features. The most plausible reading
-of the 0.98 is that it was measured on the split the parameters were selected on. This is
-the standard failure mode of tuning without a separate validation fold, and it is the
-reason §4 exists.
+**Evaluation protocol.** The 2022 numbers were read on the development split, which is
+also where the hyper-parameters were chosen. Section 4 separates the two: parameters are
+fixed in advance, models are compared by cross-validation on the training rows, and the
+test rows are scored once. Under that protocol LightGBM with library defaults reaches
+0.977 and ties for first, while the 2022 tuned configuration (`extra_trees`, 63 leaves at
+depth 10, 1\,000 rounds without early stopping) reaches 0.958 on 8\,800 rows of ternary
+features. The hold-out numbers in Table 2 are the ones to quote going forward.
 
-**Label polarity.** The report treats `Result = 1` as phishing. In the UCI documentation and
-in the feature-encoding paper the dataset comes from, $-1$ is phishing and $1$ legitimate,
-matching every feature's convention. Accuracy and ROC-AUC are symmetric under the swap, so
-the report's headline numbers are unaffected, but its per-class precision and recall
-describe the wrong class, and its statement that phishing is the majority class (55\,%) is
-backwards. The package resolves this once in the loader.
+**Label convention.** In the UCI documentation and in the feature-encoding paper the dataset
+comes from, $-1$ is phishing and $1$ legitimate, matching every feature's convention.
+Accuracy and ROC-AUC are symmetric under either reading; per-class precision and recall are
+not. The package therefore maps the label once, in the loader, to `is_phishing`, and every
+metric and figure in this report treats phishing as the positive class.
 
-Neither error changes the engineering conclusion; both change what the numbers *mean*.
+Neither change alters the engineering conclusion; both make the numbers easier to trust and
+to compare with other work on this dataset.
 
 # Conclusion
 
