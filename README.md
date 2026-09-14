@@ -10,8 +10,12 @@ caching, model-free feature analysis, eight classifiers behind one interface, an
 protocol that keeps the test fold untouched until the end.
 
 Started as a Sabancı University CS525 (Data Mining) project in 2022; rewritten in 2026 from the
-16-page report (kept in [`docs/legacy/`](docs/legacy/)) into code that reproduces, and in one
-place corrects, its results.
+16-page report (kept in [`docs/legacy/`](docs/legacy/)) into code that reproduces, and in two
+places corrects, its results.
+
+**[Read the report (PDF, 8 pages)](docs/report.pdf)** — dataset and feature analysis, evaluation
+protocol, results for eight classifiers, and what the 2022 report got wrong. Source in
+[`docs/report.md`](docs/report.md).
 
 ![model comparison](docs/figures/model-comparison.png)
 
