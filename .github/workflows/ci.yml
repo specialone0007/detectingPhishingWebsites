@@ -1,9 +1,5 @@
 name: ci
-# Checks run only on a push to main, which a merge makes; pull requests
-# and other branches run nothing, so they spend no Actions minutes.
-on:
-  push:
-    branches: [main]
+on: [push, pull_request]
 jobs:
   test:
     runs-on: ubuntu-latest
